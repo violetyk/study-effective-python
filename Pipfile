@@ -13,4 +13,5 @@ python_version = "3.7"
 [scripts]
 variables = "python variables.py"
 functions = "python functions.py"
+conditions = "python conditions.py"
 
