@@ -63,7 +63,7 @@ def main():
         #  2つのスレッドを用意し、それぞれcount_upを呼び出す
         futures = [e.submit(count_up, counter) for _ in range(threads)]
         done, not_done = wait(futures)
-        print(done, not_done)
+        #  print(done, not_done)
 
     print(f'{counter.count} != 2000000')
 
@@ -77,6 +77,25 @@ def main():
         print(done, not_done)
 
     print(f'{counter2.count} == 2000000')
+
+
+    with ThreadPoolExecutor(max_workers=3) as e:
+        #  できなかった... funcじゃなくてobjectとメソッドを渡したい
+        #  futures = [executor.submit(lambda url: d = Downloader(), d.get(url)) for url in urls]
+        for future in as_completed(futures):
+            print(future.result())
+
+
+
+class Downloader(object):
+    def get(url):
+        req = request.Request(url)
+        #  ファイル名に/等が含まれないようにする
+        name = md5(url.encode('utf-8')).hexdigest()
+        file_path = './tmp/' + name
+        with request.urlopen(req) as res:
+            Path(file_path).write_bytes(res.read())
+        return url, file_path
 
 
 #  実行時間を計るデコレータ
@@ -126,7 +145,7 @@ class ThreadSafeCounter(object):
         #  ロックを獲得して処理が終わったら速やかにロックを解放する
         #  解放漏れを防ぐためにもLockオブジェクトはwithと一緒に使う
         with self.lock:
-            #  排他制御したい一連の処理をこのブロック内に書く
+            #  排他制御したい一連の処理をこのブロック内に書く。なるべく最小限の処理で。
             self.count = self.count + 1
 
 
