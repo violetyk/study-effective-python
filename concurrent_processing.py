@@ -80,15 +80,22 @@ def main():
 
 
     with ThreadPoolExecutor(max_workers=3) as e:
-        #  できなかった... funcじゃなくてobjectとメソッドを渡したい
-        #  futures = [executor.submit(lambda url: d = Downloader(), d.get(url)) for url in urls]
+        d = Downloader()
+        futures = [e.submit(d.get(url)) for url in urls]
         for future in as_completed(futures):
-            print(future.result())
+            #  r = future.result()
+            print(future)
+
+
+
+
+    c = MyClass()
+    c.execute()
 
 
 
 class Downloader(object):
-    def get(url):
+    def get(self, url):
         req = request.Request(url)
         #  ファイル名に/等が含まれないようにする
         name = md5(url.encode('utf-8')).hexdigest()
@@ -154,5 +161,27 @@ def count_up(counter):
         counter.increment()
 
 
+import shutil
+from datetime import datetime
+class MyClass(object):
+
+    def execute(self):
+        with ThreadPoolExecutor(max_workers=4) as e:
+            e.submit(self.f, 'data/src1.txt', 'tmp/dest1_{}.txt'.format(datetime.now().timestamp()))
+            e.submit(self.f, 'data/src2.txt', 'tmp/dest2_{}.txt'.format(datetime.now().timestamp()))
+            e.submit(self.f, 'data/src3.txt', 'tmp/dest3_{}.txt'.format(datetime.now().timestamp()))
+            e.submit(self.f, 'data/src4.txt', 'tmp/dest4_{}.txt'.format(datetime.now().timestamp()))
+            #  e.submit(shutil.copy, 'data/src1.txt', 'tmp/dest1_{}.txt'.format(datetime.now().timestamp()))
+            #  e.submit(shutil.copy, 'data/src2.txt', 'tmp/dest2_{}.txt'.format(datetime.now().timestamp()))
+            #  e.submit(shutil.copy, 'data/src3.txt', 'tmp/dest3_{}.txt'.format(datetime.now().timestamp()))
+            #  e.submit(shutil.copy, 'data/src4.txt', 'tmp/dest4_{}.txt'.format(datetime.now().timestamp()))
+
+    def f(self, src, dest):
+        #  shutll.copy(src, dest)
+        print(f'{src} -> {dest}'.format(src, dest))
+
+
+
 if __name__ == '__main__':
     main()
+
