@@ -77,5 +77,11 @@ def main():
     #AttributeError: 'C' object has no attribute 'greet'
     #  call(C())
 
+    #  動的にメソッドを呼ぶ
+    c = C()
+    method_name = 'hello'
+    method = getattr(c, method_name)
+    method()
+
 if __name__ == '__main__':
     main()
